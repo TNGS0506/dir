@@ -6,7 +6,7 @@ from datetime import datetime
 data = []
 fixed_month = 5 
 
-with open("data1.csv", "r") as f:
+with open("./datas/6_11_data.csv", "r") as f:
     for line in f:
         value_str, date_str = line.strip().split()
         value = float(value_str)
@@ -16,7 +16,7 @@ with open("data1.csv", "r") as f:
 
 df = pd.DataFrame(data, columns=["timestamp", "value"])
 
-plt.figure(figsize=(18, 8))
+plt.figure(figsize=(28, 8))
 plt.plot(df["timestamp"], df["value"], marker="o")
 plt.title("Value Over Time")
 plt.xlabel("Timestamp")

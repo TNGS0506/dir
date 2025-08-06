@@ -39,10 +39,10 @@ async function getWsEndpoint() {
                     const s = date.getSeconds();
 
                     const { l, f, ts } = payload.arguments[0];
-                    console.log(f, l, ts, d);
+                    console.log(f, l, ts, d, ":", h, ":",m, ":",s);
                     const csvData = `${f} ${d}:${h}:${m}:${s}\n`;
 
-                    fs.appendFile("data1.csv", csvData, (err) => {
+                    fs.appendFile(`./datas/${d}_${h}_data.csv`, csvData, (err) => {
                         if (err) throw err;
                     });
                 }
