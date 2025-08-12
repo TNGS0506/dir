@@ -78,7 +78,7 @@ async function getWsEndpoint() {
 
 
                     console.log(f, d, ":", h, ":",m, ":",s, " Нийт:", count, "X:",baga," ","W:",ih," AVG:",truncated, " ",temdeg);
-                    const csvData = `${f} ${d}:${h}:${m}:${s} Нийт:${count} X:${baga} W:${ih} ${avg} ${temdeg}\n`;
+                    const csvData = `${f} ${d}:${h}:${m}:${s} Нийт:${count} X:${baga} W:${ih} ${truncated} ${temdeg}\n`;
 
                     fs.appendFile(`./datas/${d}_${h}_data.csv`, csvData, (err) => {
                         if (err) throw err;
