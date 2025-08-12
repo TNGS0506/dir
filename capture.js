@@ -28,6 +28,7 @@ async function getWsEndpoint() {
     let total = 0;
     let avg = 0;
 
+    let day = "";
     client.on(
         "Network.webSocketFrameReceived",
         ({ requestId, timestamp, response }) => {
@@ -48,6 +49,17 @@ async function getWsEndpoint() {
                     let temdeg = ""
 
                     const { l, f, ts } = payload.arguments[0];
+
+                    
+                    if (day != d){
+                        count = 0;
+                        baga = 0;
+                        ih = 0;
+                        total = 0;
+                        avg = 0;
+                    }
+
+                    day = d;
 
                     if(f <= 1.99){
                         baga += 1
