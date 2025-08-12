@@ -51,7 +51,7 @@ async function getWsEndpoint() {
                     const { l, f, ts } = payload.arguments[0];
 
                     
-                    if (day != d){
+                    if (day != h){
                         count = 0;
                         baga = 0;
                         ih = 0;
@@ -59,7 +59,7 @@ async function getWsEndpoint() {
                         avg = 0;
                     }
 
-                    day = d;
+                    day = h;
 
                     if(f <= 1.99){
                         baga += 1
