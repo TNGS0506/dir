@@ -38,7 +38,6 @@ async function getWsEndpoint() {
                 if (payloadString.includes('"target":"OnCrash"')) {
                     payloadString = payloadString.replace(/[^\x20-\x7E]/g, "");
                     const payload = JSON.parse(payloadString);
-                    count += 1;
 
                     const date = new Date();
                     const d = date.getDate();
