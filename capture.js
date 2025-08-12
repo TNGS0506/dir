@@ -53,6 +53,7 @@ async function getWsEndpoint() {
 
                     if (day != h) {
                         count = 0;
+                        baga = 0;
                         ih = 0;
                         total = 0;
                         avg = 0;
