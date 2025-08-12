@@ -1,21 +1,22 @@
-const puppeteer = require('puppeteer-extra');
-const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const puppeteer = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 
 module.exports = async () => {
     try {
         const options = {
-            executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-            headless: true,
+            executablePath:
+                "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+            headless: false,
             devtools: false,
             ignoreHTTPSErrors: true,
             args: [
-                '--start-maximized',
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--ignore-certificate-errors',
+                "--start-maximized",
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--ignore-certificate-errors",
             ],
-            ignoreDefaultArgs:['--enable-automation'],
-            slowMo: 10
+            ignoreDefaultArgs: ["--enable-automation"],
+            slowMo: 10,
         };
         await puppeteer.use(StealthPlugin());
         const browser = await puppeteer.launch(options);

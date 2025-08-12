@@ -16,7 +16,7 @@ async function getWsEndpoint() {
     });
 
     let page = await browser.newPage();
-    await page.goto("https://1xbet.com/en/allgamesentrance/crash");
+    await page.goto("https://melbet.org/en/games/crash");
 
     const client = await page.target().createCDPSession();
 
@@ -46,10 +46,9 @@ async function getWsEndpoint() {
                     const m = date.getMinutes();
                     const s = date.getSeconds();
 
-                    let temdeg = ""
+                    let temdeg = "";
 
                     const { l, f, ts } = payload.arguments[0];
-
 
                     if (day != h) {
                         count = 0;
@@ -62,25 +61,48 @@ async function getWsEndpoint() {
 
                     count += 1;
 
-
                     if (f <= 1.99) {
-                        baga += 1
-                        temdeg = "---"
+                        baga += 1;
+                        temdeg = "---";
                     } else {
-                        ih += 1
-                        temdeg = "+++"
+                        ih += 1;
+                        temdeg = "+++";
                     }
                     const fNum = Number(f);
                     total += fNum;
                     avg = total / count;
                     let truncated = Math.floor(avg * 100) / 100;
 
-                    console.log(f, d, ":", h, ":", m, ":", s, " Нийт:", count, "X:", baga, " ", "W:", ih, " AVG:", truncated, " ", temdeg);
+                    console.log(
+                        f,
+                        d,
+                        ":",
+                        h,
+                        ":",
+                        m,
+                        ":",
+                        s,
+                        " Нийт:",
+                        count,
+                        "X:",
+                        baga,
+                        " ",
+                        "W:",
+                        ih,
+                        " AVG:",
+                        truncated,
+                        " ",
+                        temdeg
+                    );
                     const csvData = `${f} ${d}:${h}:${m}:${s} Нийт:${count} X:${baga} W:${ih} ${truncated} ${temdeg}\n`;
 
-                    fs.appendFile(`./datas/${d}_${h}_data.csv`, csvData, (err) => {
-                        if (err) throw err;
-                    });
+                    fs.appendFile(
+                        `./datas/${d}_${h}_data.csv`,
+                        csvData,
+                        (err) => {
+                            if (err) throw err;
+                        }
+                    );
                 }
             } catch (error) {
                 console.error("Error processing WebSocket frame:", error);
