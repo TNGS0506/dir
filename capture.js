@@ -50,34 +50,31 @@ async function getWsEndpoint() {
 
                     const { l, f, ts } = payload.arguments[0];
 
-                    
-                    if (day != h){
+
+                    if (day != h) {
                         count = 0;
-                        baga = 0;
                         ih = 0;
                         total = 0;
                         avg = 0;
+                        day = h;
                     }
 
-                    day = h;
+                    count += 1;
 
-                    if(f <= 1.99){
+
+                    if (f <= 1.99) {
                         baga += 1
                         temdeg = "---"
-                    }else{
+                    } else {
                         ih += 1
                         temdeg = "+++"
                     }
-                    total += f
-
-                    avg = total / count
-                
+                    const fNum = Number(f);
+                    total += fNum;
+                    avg = total / count;
                     let truncated = Math.floor(avg * 100) / 100;
 
-
-
-
-                    console.log(f, d, ":", h, ":",m, ":",s, " Нийт:", count, "X:",baga," ","W:",ih," AVG:",truncated, " ",temdeg);
+                    console.log(f, d, ":", h, ":", m, ":", s, " Нийт:", count, "X:", baga, " ", "W:", ih, " AVG:", truncated, " ", temdeg);
                     const csvData = `${f} ${d}:${h}:${m}:${s} Нийт:${count} X:${baga} W:${ih} ${truncated} ${temdeg}\n`;
 
                     fs.appendFile(`./datas/${d}_${h}_data.csv`, csvData, (err) => {
