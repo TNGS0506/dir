@@ -22,6 +22,12 @@ async function getWsEndpoint() {
 
     await client.send("Network.enable");
 
+    let count = 0;
+    let baga = 0;
+    let ih = 0;
+    let total = 0;
+    let avg = 0;
+
     client.on(
         "Network.webSocketFrameReceived",
         ({ requestId, timestamp, response }) => {
@@ -31,6 +37,7 @@ async function getWsEndpoint() {
                 if (payloadString.includes('"target":"OnCrash"')) {
                     payloadString = payloadString.replace(/[^\x20-\x7E]/g, "");
                     const payload = JSON.parse(payloadString);
+                    count += 1;
 
                     const date = new Date();
                     const d = date.getDate();
@@ -38,9 +45,28 @@ async function getWsEndpoint() {
                     const m = date.getMinutes();
                     const s = date.getSeconds();
 
+                    let temdeg = ""
+
                     const { l, f, ts } = payload.arguments[0];
-                    console.log(f, l, ts, d, ":", h, ":",m, ":",s);
-                    const csvData = `${f} ${d}:${h}:${m}:${s}\n`;
+
+                    if(f <= 1.99){
+                        baga += 1
+                        temdeg = "---"
+                    }else{
+                        ih += 1
+                        temdeg = "+++"
+                    }
+                    total += f
+
+                    avg = total / count
+                
+                    let truncated = Math.floor(avg * 100) / 100;
+
+
+
+
+                    console.log(f, d, ":", h, ":",m, ":",s, " Нийт:", count, "X:",baga," ","W:",ih," AVG:",truncated, " ",temdeg);
+                    const csvData = `${f} ${d}:${h}:${m}:${s} Нийт:${count} X:${baga} W:${ih} ${avg} ${temdeg}\n`;
 
                     fs.appendFile(`./datas/${d}_${h}_data.csv`, csvData, (err) => {
                         if (err) throw err;
