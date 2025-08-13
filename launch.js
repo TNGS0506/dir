@@ -6,7 +6,7 @@ module.exports = async () => {
         const options = {
             executablePath:
                 "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-            headless: false,
+            headless: true,
             devtools: false,
             ignoreHTTPSErrors: true,
             args: [
