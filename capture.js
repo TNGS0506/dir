@@ -3,11 +3,26 @@ const launch = require("./launch");
 const fs = require("fs");
 const wait = (ms) => new Promise((res) => setTimeout(res, ms));
 
-//get WsEndpoint
+// Get WsEndpoint
 async function getWsEndpoint() {
     let wsEndpoint = await launch();
     return wsEndpoint;
 }
+
+// column widths for fixed-width formatting
+const colWidths = {
+    f: 8,        // crash multiplier
+    date: 16,    // date/time
+    count: 8,
+    baga: 6,
+    ih: 6,
+    avg: 8,
+    temdeg: 6,
+    diff: 6
+};
+
+// helper pad function
+const pad = (value, width) => String(value).padEnd(width, " ");
 
 (async () => {
     const browser = await puppeteer.connect({
@@ -16,10 +31,9 @@ async function getWsEndpoint() {
     });
 
     let page = await browser.newPage();
-    await page.goto("https://1xbet.com/en/allgamesentrance/crash");
+    await page.goto("https://mongolia-melbet.org/en/games/crash");
 
     const client = await page.target().createCDPSession();
-
     await client.send("Network.enable");
 
     let count = 0;
@@ -27,18 +41,17 @@ async function getWsEndpoint() {
     let ih = 0;
     let total = 0;
     let avg = 0;
-
     let day = "";
+
     client.on(
         "Network.webSocketFrameReceived",
-        ({ requestId, timestamp, response }) => {
+        ({ response }) => {
             let payloadString = response.payloadData.toString("utf8");
 
             try {
                 if (payloadString.includes('"target":"OnCrash"')) {
                     payloadString = payloadString.replace(/[^\x20-\x7E]/g, "");
                     const payload = JSON.parse(payloadString);
-                    count += 1;
 
                     const date = new Date();
                     const d = date.getDate();
@@ -46,10 +59,8 @@ async function getWsEndpoint() {
                     const m = date.getMinutes();
                     const s = date.getSeconds();
 
-                    let temdeg = ""
-
-                    const { l, f, ts } = payload.arguments[0];
-
+                    let temdeg = "";
+                    const { f } = payload.arguments[0];
 
                     if (day != h) {
                         count = 0;
@@ -62,23 +73,38 @@ async function getWsEndpoint() {
 
                     count += 1;
 
-
                     if (f <= 1.99) {
-                        baga += 1
-                        temdeg = "---"
+                        baga += 1;
+                        temdeg = "---";
                     } else {
-                        ih += 1
-                        temdeg = "+++"
+                        ih += 1;
+                        temdeg = "+++";
                     }
+
                     const fNum = Number(f);
                     total += fNum;
                     avg = total / count;
                     let truncated = Math.floor(avg * 100) / 100;
+                    let diff = ih - baga;
 
-                    console.log(f, d, ":", h, ":", m, ":", s, " Нийт:", count, "X:", baga, " ", "W:", ih, " AVG:", truncated, " ", temdeg);
-                    const csvData = `${f} ${d}:${h}:${m}:${s} Нийт:${count} X:${baga} W:${ih} ${truncated} ${temdeg}\n`;
+                    const dateStr = `${d}___${h}:${m}:${s}`;
 
-                    fs.appendFile(`./datas/${d}_${h}_data.csv`, csvData, (err) => {
+                    // formatted line
+                    const line =
+                        pad(f, colWidths.f) +
+                        pad(dateStr, colWidths.date) +
+                        pad(count, colWidths.count) +
+                        pad(baga, colWidths.baga) +
+                        pad(ih, colWidths.ih) +
+                        pad(truncated, colWidths.avg) +
+                        pad(temdeg, colWidths.temdeg) +
+                        pad(diff, colWidths.diff);
+
+                    // print aligned output
+                    console.log(line);
+
+                    // save aligned output to file
+                    fs.appendFile(`./datas/${d}_${h}_data.txt`, line + "\n", (err) => {
                         if (err) throw err;
                     });
                 }
