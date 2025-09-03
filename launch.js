@@ -5,7 +5,7 @@ module.exports = async () => {
   try {
     const options = {
       executablePath: "/usr/bin/chromium",
-      headless: false,
+      headless: true,
       devtools: false,
       ignoreHTTPSErrors: true,
       args: [

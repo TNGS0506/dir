@@ -37,27 +37,34 @@ async function startScraper() {
 
     await page.waitForSelector(".auth-dropdown-trigger");
     await page.click(".auth-dropdown-trigger");
+
     await page.waitForSelector(".auth-form-extended");
     await page.click(".auth-form-extended-tabs__item");
+    console.log("typing user id");
     await page.waitForSelector(".auth-form-extended-fields__input");
     await page.type('input[name="username"]', "1331407561");
+    console.log("typing password...");
     await page.waitForSelector(".auth-form-extended-fields__input");
     await page.type('input[name="username-password"]', "dqrme8D2");
     await page.waitForSelector("button.ui-button--theme-accent");
     await page.click("button.ui-button--theme-accent");
+    console.log("Loggin in...");
     await page.waitForSelector(".ui-input__field");
     await page.type(
       'input[class="ui-input__field ui-input-field"]',
       "gamtulga"
     );
+    console.log("VERIFICATION");
     await page.waitForSelector("button.user-verify-app__submit");
     await page.click("button.user-verify-app__submit");
     await page.goto("https://mongolia-melbet.org/en/games/crash");
+    console.log("SUCCESS");
 
     client = await page.target().createCDPSession();
     await client.send("Network.enable");
 
     console.log("🟢 Connected to browser & page");
+    console.log("🟢 The Scrape has begun");
 
     let count = 0;
     let baga = 0;
