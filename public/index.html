@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Crash Game Dashboard</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      canvas {
+        width: 100%;
+        max-width: 600px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      style="
+        height: 600px;
+        overflow-y: scroll;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+      "
+      id="tableContainer"
+    >
+      <table
+        id="outputTable"
+        border="1"
+        cellspacing="0"
+        cellpadding="5"
+        style="font-family: monospace; width: 100%; max-width: 100%"
+      >
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Avg</th>
+            <th>Count</th>
+            <th>Baga</th>
+            <th>ih</th>
+            <th>Score</th>
+            <th>Diff</th>
+            <th>Mark</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Rows will be appended here -->
+        </tbody>
+      </table>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const tbody = document.querySelector("#outputTable tbody");
+      const container = document.getElementById("tableContainer");
+      const MAX_ROWS = 2000;
+      const socket = io();
+
+      function createRow(data) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+        <td>${data.dateStr}</td>
+        <td>${data.avg.toFixed(2)}</td>
+        <td>${data.count}</td>
+        <td>${data.baga}</td>
+        <td>${data.ih}</td>
+        <td>${data.f}</td>
+        <td>${data.diff}</td>
+        <td>${data.temdeg}</td>
+      `;
+        return tr;
+      }
+
+      // Render full history on connect
+      socket.on("crash-history", (history) => {
+        tbody.innerHTML = "";
+        history.forEach((data) => {
+          tbody.appendChild(createRow(data));
+        });
+        container.scrollTop = container.scrollHeight;
+      });
+
+      // Append new data live
+      socket.on("crash-data", (data) => {
+        tbody.appendChild(createRow(data));
+
+        while (tbody.rows.length > MAX_ROWS) {
+          tbody.removeChild(tbody.firstChild);
+        }
+
+        container.scrollTop = container.scrollHeight;
+      });
+    </script>
+  </body>
+</html>
