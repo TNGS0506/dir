@@ -24,45 +24,49 @@ const colWidths = {
 // helper pad function
 const pad = (value, width) => String(value).padEnd(width, " ");
 
-(async () => {
-    const browser = await puppeteer.connect({
-        browserWSEndpoint: await getWsEndpoint(),
-        defaultViewport: null,
-    });
+async function startScraper() {
+    let browser, page, client;
+    try {
+        browser = await puppeteer.connect({
+            browserWSEndpoint: await getWsEndpoint(),
+            defaultViewport: null,
+        });
 
-    let page = await browser.newPage();
-    await page.goto("https://mongolia-melbet.org/en/games/crash");
+        page = await browser.newPage();
+        await page.goto("https://mongolia-melbet.org/en/games/crash");
 
-    const client = await page.target().createCDPSession();
-    await client.send("Network.enable");
+        client = await page.target().createCDPSession();
+        await client.send("Network.enable");
 
-    let count = 0;
-    let baga = 0;
-    let ih = 0;
-    let total = 0;
-    let avg = 0;
-    let day = "";
+        console.log("🟢 Connected to browser & page");
 
-    client.on(
-        "Network.webSocketFrameReceived",
-        ({ response }) => {
+        let count = 0;
+        let baga = 0;
+        let ih = 0;
+        let total = 0;
+        let avg = 0;
+        let day = "";
+
+        let previousTime = null;
+
+        client.on("Network.webSocketFrameReceived", ({ response }) => {
             let payloadString = response.payloadData.toString("utf8");
 
             try {
                 if (payloadString.includes('"target":"OnCrash"')) {
                     payloadString = payloadString.replace(/[^\x20-\x7E]/g, "");
                     const payload = JSON.parse(payloadString);
+                    const { f } = payload.arguments[0];
 
                     const date = new Date();
+                    const month = date.getMonth();
                     const d = date.getDate();
                     const h = date.getHours();
                     const m = date.getMinutes();
                     const s = date.getSeconds();
 
                     let temdeg = "";
-                    const { f } = payload.arguments[0];
-
-                    if (day != h) {
+                    if (day !== h) {
                         count = 0;
                         baga = 0;
                         ih = 0;
@@ -72,7 +76,6 @@ const pad = (value, width) => String(value).padEnd(width, " ");
                     }
 
                     count += 1;
-
                     if (f <= 1.99) {
                         baga += 1;
                         temdeg = "---";
@@ -84,13 +87,13 @@ const pad = (value, width) => String(value).padEnd(width, " ");
                     const fNum = Number(f);
                     total += fNum;
                     avg = total / count;
-                    let truncated = Math.floor(avg * 100) / 100;
-                    let diff = ih - baga;
+                    const truncated = Math.floor(avg * 100) / 100;
+                    const diff = ih - baga;
+                    const dateStr = `${month}.${d}___${h}:${m}:${s}`;
+                    const interval = previousTime ? Math.floor((date - previousTime) / 1000) : 0;
+                    previousTime = date;
 
-                    const dateStr = `${d}___${h}:${m}:${s}`;
-
-                    // formatted line
-                    const line =
+                    const line = 
                         pad(f, colWidths.f) +
                         pad(dateStr, colWidths.date) +
                         pad(count, colWidths.count) +
@@ -98,26 +101,41 @@ const pad = (value, width) => String(value).padEnd(width, " ");
                         pad(ih, colWidths.ih) +
                         pad(truncated, colWidths.avg) +
                         pad(temdeg, colWidths.temdeg) +
-                        pad(diff, colWidths.diff);
+                        pad(diff, colWidths.diff) +
+                        pad(interval + "s", 8);
 
-                    // print aligned output
                     console.log(line);
-
-                    // save aligned output to file
                     fs.appendFile(`./datas/${d}_${h}_data.txt`, line + "\n", (err) => {
                         if (err) throw err;
                     });
                 }
             } catch (error) {
-                console.error("Error processing WebSocket frame:", error);
+                console.error("❌ WebSocket processing error:", error);
+            }
+        });
+
+        // Simulate interaction to keep page alive
+        while (true) {
+            await page.keyboard.press("Tab");
+            await wait(100000);
+            await page.keyboard.press("ArrowDown");
+            await wait(100000);
+        }
+
+    } catch (error) {
+        console.error("🔌 Connection lost or error:", error.message);
+        if (browser) {
+            try {
+                await browser.close();
+            } catch (e) {
+                console.warn("⚠️ Couldn't close browser:", e.message);
             }
         }
-    );
-
-    while (true) {
-        await page.keyboard.press("Tab");
-        await wait(100000);
-        await page.keyboard.press("ArrowDown");
-        await wait(100000);
+        console.log("🔁 Reconnecting in 10 seconds...");
+        await wait(10000);
+        return startScraper(); // Recursive restart
     }
-})();
+}
+startScraper()
+
+
