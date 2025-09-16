@@ -123,7 +123,7 @@ async function startScraper() {
           const fNum = Number(f);
           total += fNum;
           avg = total / count;
-          const truncated = Math.floor(avg * 100) / 100;
+          const median = Math.floor(getMedian(multipliers) * 100) / 100;
           const diff = ih - baga;
           const dateStr = `${month}.${d}___${h}:${m}:${s}`;
 
@@ -194,4 +194,4 @@ function getMedian(arr) {
   }
 }
 
-const median = Math.floor(getMedian(multipliers) * 100) / 100;
+
