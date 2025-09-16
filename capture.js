@@ -79,7 +79,7 @@ async function startScraper() {
     let baga = 0;
     let ih = 0;
     let total = 0;
-    let avg = 0;
+
     let day = "";
 
     client.on("Network.webSocketFrameReceived", ({ response }) => {
@@ -122,7 +122,6 @@ async function startScraper() {
 
           const fNum = Number(f);
           total += fNum;
-          avg = total / count;
           const median = Math.floor(getMedian(multipliers) * 100) / 100;
           const diff = ih - baga;
           const dateStr = `${month}.${d}___${h}:${m}:${s}`;
@@ -139,7 +138,7 @@ async function startScraper() {
 
           emitCrashData({
             f,
-            avg: truncated,
+            avg: median,
             count,
             baga,
             ih,
@@ -149,7 +148,7 @@ async function startScraper() {
             timestamp: Date.now(),
           });
 
-          fs.appendFile(`./NewDatas/${d}_${h}_data.txt`, line + "\n", (err) => {
+          fs.appendFile(`./09_16/${d}_${h}_data.txt`, line + "\n", (err) => {
             if (err) throw err;
           });
         }
