@@ -4,7 +4,7 @@ const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 module.exports = async () => {
   try {
     const options = {
-      executablePath: "/usr/bin/chromium",
+      executablePath: "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
       headless: true,
       devtools: false,
       ignoreHTTPSErrors: true,
