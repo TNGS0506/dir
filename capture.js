@@ -145,7 +145,7 @@ async function startScraper() {
             timestamp: Date.now(),
           });
 
-          fs.appendFile(`./datas/${d}_${h}_data.txt`, line + "\n", (err) => {
+          fs.appendFile(`./newDatas/${d}_${h}_data.txt`, line + "\n", (err) => {
             if (err) throw err;
           });
         }
