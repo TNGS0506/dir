@@ -7,7 +7,6 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Store last 1000 rows
 const MAX_HISTORY = 1000;
 const crashHistory = [];
 
@@ -19,14 +18,11 @@ function emitCrashData(data) {
   io.emit("crash-data", data);
 }
 
-// Serve frontend static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// **Put the connection handler here:**
 io.on("connection", (socket) => {
   console.log("Client connected");
 
-  // Send the last 1000 rows to the newly connected client
   socket.emit("crash-history", crashHistory);
 
   socket.on("disconnect", () => {
@@ -34,7 +30,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// Start the server
 server.listen(3000, () => {
   console.log("🌐 Dashboard running at http://localhost:3000");
 });
