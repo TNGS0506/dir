@@ -74,11 +74,12 @@ async function startScraper() {
     console.log("🟢 Connected to browser & page");
     console.log("🟢 The Scrape has begun");
 
+    let multipliers = []; 
     let count = 0;
     let baga = 0;
     let ih = 0;
     let total = 0;
-    let avg = 0;
+
     let day = "";
 
     client.on("Network.webSocketFrameReceived", ({ response }) => {
@@ -96,6 +97,9 @@ async function startScraper() {
           const h = date.getHours();
           const m = date.getMinutes();
           const s = date.getSeconds();
+
+          
+          multipliers.push(f);
 
           let temdeg = "";
           if (day !== h) {
@@ -118,8 +122,7 @@ async function startScraper() {
 
           const fNum = Number(f);
           total += fNum;
-          avg = total / count;
-          const truncated = Math.floor(avg * 100) / 100;
+          const median = Math.floor(getMedian(multipliers) * 100) / 100;
           const diff = ih - baga;
           const dateStr = `${month}.${d}___${h}:${m}:${s}`;
 
@@ -129,13 +132,13 @@ async function startScraper() {
             pad(count, colWidths.count) +
             pad(baga, colWidths.baga) +
             pad(ih, colWidths.ih) +
-            pad(truncated, colWidths.avg) +
+            pad(median, colWidths.avg) +
             pad(temdeg, colWidths.temdeg) +
             pad(diff, colWidths.diff);
 
           emitCrashData({
             f,
-            avg: truncated,
+            avg: median,
             count,
             baga,
             ih,
@@ -145,7 +148,7 @@ async function startScraper() {
             timestamp: Date.now(),
           });
 
-          fs.appendFile(`./newDatas/${d}_${h}_data.txt`, line + "\n", (err) => {
+          fs.appendFile(`./09_16/${d}_${h}_data.txt`, line + "\n", (err) => {
             if (err) throw err;
           });
         }
@@ -176,3 +179,18 @@ async function startScraper() {
   }
 }
 startScraper();
+
+
+
+
+function getMedian(arr) {
+  const sorted = [...arr].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 0) {
+    return (sorted[mid - 1] + sorted[mid]) / 2;
+  } else {
+    return sorted[mid];
+  }
+}
+
+
