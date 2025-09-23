@@ -11,7 +11,7 @@ module.exports = async () => {
   try {
     const options = {
         executablePath: executablePath,
-      headless: false,
+      headless: true,
       devtools: false,
       ignoreHTTPSErrors: true,
       args: [
