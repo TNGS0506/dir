@@ -4,6 +4,8 @@
     <title>Crash Game Dashboard</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2"></script>
+
     <style>
       body {
         font-family: sans-serif;
@@ -84,9 +86,29 @@
             y: {
               title: { display: true, text: "Multiplier" },
               beginAtZero: true,
+              suggestedMax: 35, // optional, since your data is 1–35
+            },
+          },
+          plugins: {
+            annotation: {
+              annotations: {
+                lineAt2: {
+                  type: "line",
+                  yMin: 2,
+                  yMax: 2,
+                  borderColor: "red",
+                  borderWidth: 2,
+                  label: {
+                    enabled: true,
+                    content: "Reference 2",
+                    position: "start",
+                  },
+                },
+              },
             },
           },
         },
+        plugins: [Chart.registry.getPlugin("annotation")],
       });
 
       function createRow(data) {
