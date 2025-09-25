@@ -11,7 +11,6 @@
       }
       canvas {
         width: 100%;
-        max-width: 600px;
       }
     </style>
   </head>
@@ -44,44 +43,82 @@
             <th>Mark</th>
           </tr>
         </thead>
-        <tbody>
-          <!-- Rows will be appended here -->
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <h2>Crash Multipliers Chart</h2>
+    <canvas id="crashChart"></canvas>
+
+    <!-- Put your script AFTER the canvas -->
     <script>
       const tbody = document.querySelector("#outputTable tbody");
       const container = document.getElementById("tableContainer");
       const MAX_ROWS = 2000;
       const socket = io();
 
+      // --- Chart.js setup ---
+      const ctx = document.getElementById("crashChart").getContext("2d");
+      const crashChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "Crash Multiplier (f)",
+              data: [],
+              borderColor: "rgba(75,192,192,1)",
+              backgroundColor: "rgba(75,192,192,0.2)",
+              borderWidth: 2,
+              fill: true,
+              pointRadius: 0,
+              tension: 0.25,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          animation: false,
+          scales: {
+            x: { title: { display: true, text: "Time" } },
+            y: {
+              title: { display: true, text: "Multiplier" },
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+
       function createRow(data) {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-        <td>${data.dateStr}</td>
-        <td>${data.avg.toFixed(2)}</td>
-        <td>${data.count}</td>
-        <td>${data.baga}</td>
-        <td>${data.ih}</td>
-        <td>${data.f}</td>
-        <td>${data.diff}</td>
-        <td>${data.temdeg}</td>
-      `;
+          <td>${data.dateStr}</td>
+          <td>${data.avg.toFixed(2)}</td>
+          <td>${data.count}</td>
+          <td>${data.baga}</td>
+          <td>${data.ih}</td>
+          <td>${data.f}</td>
+          <td>${data.diff}</td>
+          <td>${data.temdeg}</td>
+        `;
         return tr;
       }
 
-      // Render full history on connect
       socket.on("crash-history", (history) => {
         tbody.innerHTML = "";
+        crashChart.data.labels = [];
+        crashChart.data.datasets[0].data = [];
+
         history.forEach((data) => {
           tbody.appendChild(createRow(data));
+          crashChart.data.labels.push(data.dateStr);
+          crashChart.data.datasets[0].data.push(Number(data.f));
         });
+
+        crashChart.update();
         container.scrollTop = container.scrollHeight;
       });
 
-      // Append new data live
       socket.on("crash-data", (data) => {
         tbody.appendChild(createRow(data));
 
@@ -89,6 +126,15 @@
           tbody.removeChild(tbody.firstChild);
         }
 
+        crashChart.data.labels.push(data.dateStr);
+        crashChart.data.datasets[0].data.push(Number(data.f));
+
+        if (crashChart.data.labels.length > MAX_ROWS) {
+          crashChart.data.labels.shift();
+          crashChart.data.datasets[0].data.shift();
+        }
+
+        crashChart.update("none");
         container.scrollTop = container.scrollHeight;
       });
     </script>
