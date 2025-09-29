@@ -38,8 +38,12 @@ async function startScraper() {
       defaultViewport: null,
     });
 
+
+      const id = '1331407561'            /// Id
+      const password = 'dqrme8D2'        ///PASSWORD
+
     page = await browser.newPage();
-    await page.goto("https://mongolia-melbet.org/en/games/crash");
+    await page.goto("https://mongolia-melbet.com/en/games/crash");
 
     await page.waitForSelector(".auth-dropdown-trigger");
     await page.click(".auth-dropdown-trigger");
@@ -48,10 +52,12 @@ async function startScraper() {
     await page.click(".auth-form-extended-tabs__item");
 
     await page.waitForSelector(".auth-form-extended-fields__input");
-    await page.type('input[name="username"]', "1331407561");
+
+    await page.type('input[name="username"]', id);
 
     await page.waitForSelector(".auth-form-extended-fields__input");
-    await page.type('input[name="username-password"]', "dqrme8D2");
+    
+    await page.type('input[name="username-password"]', password);    
     await page.waitForSelector("button.ui-button--theme-accent");
     await page.click("button.ui-button--theme-accent");
 

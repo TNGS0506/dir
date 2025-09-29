@@ -11,7 +11,7 @@ module.exports = async () => {
   try {
     const options = {
         executablePath: executablePath,
-      headless: true,
+      headless: true,      ///browser нээхгүй бол true, нээхээр бол false
       devtools: false,
       ignoreHTTPSErrors: true,
       args: [
