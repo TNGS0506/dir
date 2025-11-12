@@ -39,7 +39,7 @@ async function startScraper() {
     });
 
 
-      const id = '1331407561'            /// Id
+      
       const password = 'dqrme8D2'        ///PASSWORD
 
     page = await browser.newPage();
@@ -53,11 +53,11 @@ async function startScraper() {
 
     await page.waitForSelector(".auth-form-extended-fields__input");
 
-    await page.type('input[name="username"]', id);
+    await page.type('input[name="username"]', '1331407561');
 
     await page.waitForSelector(".auth-form-extended-fields__input");
     
-    await page.type('input[name="username-password"]', password);    
+    await page.type('input[name="username-password"]', 'dqrme8D2');    
     await page.waitForSelector("button.ui-button--theme-accent");
     await page.click("button.ui-button--theme-accent");
 
@@ -104,8 +104,7 @@ async function startScraper() {
           const m = date.getMinutes();
           const s = date.getSeconds();
 
-          
-          multipliers.push(f);
+         multipliers.push(f);
 
           let temdeg = "";
           if (day !== h) {
@@ -154,7 +153,7 @@ async function startScraper() {
             timestamp: Date.now(),
           });
 
-          fs.appendFile(`./09_16/${d}_${h}_data.txt`, line + "\n", (err) => {
+          fs.appendFile(`./november/${d}_${h}_data.txt`, line + "\n", (err) => {
             if (err) throw err;
           });
         }
